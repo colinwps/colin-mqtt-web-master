@@ -46,6 +46,9 @@
 </template>
 
 <script>
+	import {options,url,list} from '@/mqtt_config/mqttclient.js';
+	var mqtt = require('mqtt/dist/mqtt');
+	var client;
 	export default {
 		data() {
 			return {
@@ -56,12 +59,28 @@
 		},
 		methods: {
 			change(value) {
-							this.numberValue = value
+				this.numberValue = value
 		    },
+			connect(){
+				var _this = this;
+				client = mqtt.connect(url,options);
+				client.on('connect',function(){
+					_this.connState = true;
+					client.subscribe(list,{
+						qos:1
+					},err=>{
+						console.log(err || '订阅成功');
+					});
+				});
+			},
 
 		},
 		onInit: {
 			
+		},
+		//页面挂载完调用
+		mounted() {
+			this.connect();
 		}
 	}
 </script>
